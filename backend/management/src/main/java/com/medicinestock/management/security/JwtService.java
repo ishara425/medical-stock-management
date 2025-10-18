@@ -4,18 +4,29 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.security.Key;
 
 @Service
 public class JwtService {
 
+    private static final Logger logger = LoggerFactory.getLogger(JwtService.class);
+
     @Value("${app.jwt.secret}")
     private String secretKey;
 
     private Key getSignKey() {
-        return Keys.hmacShaKeyFor(secretKey.getBytes());
+        logger.debug("Using secret key: {}", secretKey);
+        byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
+        logger.debug("JWT key length: {} bits", keyBytes.length * 8);
+        if (keyBytes.length < 32) {
+            throw new IllegalArgumentException("JWT secret key must be at least 32 bytes long for HS256");
+        }
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 
     public String generateToken(String username) {
@@ -37,6 +48,7 @@ public class JwtService {
             Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token);
             return true;
         } catch (JwtException e) {
+            logger.error("JWT validation failed: {}", e.getMessage());
             return false;
         }
     }
