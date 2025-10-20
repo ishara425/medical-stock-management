@@ -3,6 +3,8 @@ import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-
 import { LogOut } from 'lucide-react';
 import Sidebar from './Sidebar';
 import MedicineDashboard from './MedicineDashboard';
+import StockDashboard from './StockDashboard';
+import MedicineDistributions from './MedicineDistributions';
 
 const DashboardLayout = () => {
   const navigate = useNavigate();
@@ -15,7 +17,7 @@ const DashboardLayout = () => {
     if (path.includes('/stock')) return 'stock';
     if (path.includes('/distributions')) return 'distributions';
     if (path.includes('/reports')) return 'reports';
-    return 'medicines'; // Default to medicines
+    return 'medicines';
   };
 
   const [activeTab, setActiveTab] = useState(getActiveTab());
@@ -23,7 +25,6 @@ const DashboardLayout = () => {
   const handleTabChange = (tabId) => {
     setActiveTab(tabId);
     
-    // Navigate to appropriate route
     const routes = {
       medicines: '/dashboard/medicines',
       stock: '/dashboard/stock',
@@ -64,21 +65,10 @@ const DashboardLayout = () => {
 
         {/* Route Content */}
         <Routes>
-          {/* Redirect /dashboard to /dashboard/medicines */}
           <Route path="/" element={<Navigate to="/dashboard/medicines" replace />} />
           <Route path="/medicines" element={<MedicineDashboard />} />
-          <Route path="/stock" element={
-            <div className="p-8">
-              <h2 className="text-2xl font-bold">Stock Management</h2>
-              <p className="text-gray-600">Coming soon...</p>
-            </div>
-          } />
-          <Route path="/distributions" element={
-            <div className="p-8">
-              <h2 className="text-2xl font-bold">Distributions</h2>
-              <p className="text-gray-600">Coming soon...</p>
-            </div>
-          } />
+          <Route path="/stock" element={<StockDashboard />} /> 
+          <Route path="/distributions" element={<MedicineDistributions />} /> 
           <Route path="/reports" element={
             <div className="p-8">
               <h2 className="text-2xl font-bold">Reports</h2>
